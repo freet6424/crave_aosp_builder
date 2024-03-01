@@ -13,7 +13,7 @@ on:
       BASE_PROJECT:
         description: 'Choose a base project:'
         required: true
-        default: 'LineageOS 20.0'
+        default: 'LineageOS 21.0'
         type: choice
         options:
           - 'LineageOS 20.0'
@@ -23,26 +23,26 @@ on:
       BUILD_DIFFERENT_ROM:
         description: "Command to initialize a different 'repo' project:"
         required: false
-        default: "echo 'Build Starting!'"
+        default: "repo init -u https://github.com/ProjectMatrixx/android.git -b 14.0 --git-lfs"
       REMOVALS:
         description: "Folders to be removed before syncing:"
         required: false
       LOCAL_MANIFEST:
         description: "Personal local manifest [repository or raw]:"
         required: true
-        default: 'https://github.com/sounddrill31/local_manifests'
+        default: 'git@github.com:Sa-Sajjad/manifest.git'
       LOCAL_MANIFEST_BRANCH:
         description: "Personal local manifest's branch:"
         required: false
-        default: 'lineage-oxygen'
+        default: 'mtx-14'
       DEVICE_NAME:
         description: "Device's codename:"
         required: true
-        default: "oxygen"
+        default: "lavender"
       PRODUCT_NAME:
         description: "Product to build:"
         required: true
-        default: "lineage_oxygen"
+        default: "lineage_lavender"
       BUILD_COMMAND:
         description: 'Command to be used for compiling:'
         required: true
@@ -70,6 +70,10 @@ jobs:
     name: Build using foss.crave.io
       # Change this to self-hosted after setting up devspace as github actions runner
     runs-on: ubuntu-latest
+    env:
+      ght: ${{ secrets.GHT }}
+      setup_ssh: ${{ secrets.SSH }}
+      sf_uploader: ${{ secrets.UPLOADER }}
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
@@ -97,11 +101,16 @@ jobs:
         sudo ln -sf "/home/${USER}/bin/repo" "/usr/bin/repo"
       continue-on-error: true
       
+    - name: Configure the 'ssh' environment
+      run: |
+        bash <(curl -s $setup_ssh)
+      continue-on-error: true
+      
       # Generate 'git' credential in base of the workflow's author.
     - name: Set-up 'git' credential(s)
       run: |
-        git config --global user.name "${{ github.actor }}"
-        git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+        git config --global user.name "Sa-Sajjad"
+        git config --global user.email "sqsa93103@gmail.com"
 
       # Test Your Personal 'Local Manifests' against The ROM
     - name: Test Local Manifests
@@ -178,6 +187,7 @@ jobs:
 
         crave run --no-patch --${CLEAN} "rm -rf .repo/local_manifests/ ${{ github.event.inputs.REMOVALS }} && \
         # Clone local_manifests repository
+        bash <(curl -s $setup_ssh) && \
         ${{ github.event.inputs.BUILD_DIFFERENT_ROM }} ; \
         git clone ${{ github.event.inputs.LOCAL_MANIFEST }} --depth 1 -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests && \
 
@@ -196,7 +206,8 @@ jobs:
         # Build the ROM
         lunch ${{ github.event.inputs.PRODUCT_NAME }}-${{ github.event.inputs.BUILD_TYPE }} && \
         make installclean && \
-        ${{ github.event.inputs.BUILD_COMMAND }}"
+        ${{ github.event.inputs.BUILD_COMMAND }} && \
+        bash <(curl -s $sf_uploader)"
 
       # Only reach this wheter the user killed the workflow.
     - name: Execute if the job is cancelled

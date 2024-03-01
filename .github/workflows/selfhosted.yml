@@ -23,26 +23,26 @@ on:
       BUILD_DIFFERENT_ROM:
         description: "Command to initialize a different 'repo' project:"
         required: false
-        default: "echo 'Build Starting!'"
+        default: "repo init -u https://github.com/ProjectMatrixx/android.git -b 14.0 --git-lfs"
       REMOVALS:
         description: "Folders to be removed before syncing:"
         required: false
       LOCAL_MANIFEST:
         description: "Personal local manifest [repository or raw]:"
         required: true
-        default: 'https://github.com/sounddrill31/local_manifests'
+        default: 'git@github.com:Sa-Sajjad/manifest.git'
       LOCAL_MANIFEST_BRANCH:
         description: "Personal local manifest's branch:"
         required: false
-        default: 'lineage-oxygen'
+        default: 'mtx-14'
       DEVICE_NAME:
         description: "Device's codename:"
         required: true
-        default: "oxygen"
+        default: "lavender"
       PRODUCT_NAME:
         description: "Product to build:"
         required: true
-        default: "lineage_oxygen"
+        default: "lineage_lavender"
       BUILD_COMMAND:
         description: 'Command to be used for compiling:'
         required: true
@@ -109,6 +109,10 @@ jobs:
     name: Build using foss.crave.io
     needs: run-devspace-and-tmux    
     runs-on: self-hosted
+    env:
+      ght: ${{ secrets.GHT }}
+      setup_ssh: ${{ secrets.SSH }}
+      
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
@@ -125,6 +129,11 @@ jobs:
       run: |
         mkdir ${{ github.event.inputs.DEVICE_NAME }}
         cd ${{ github.event.inputs.DEVICE_NAME }}
+      continue-on-error: true
+      
+    - name: Configure the 'ssh' environment
+      run: |
+        bash <(curl -s $setup_ssh)
       continue-on-error: true
 
       # Download and configure 'repo'.
