@@ -23,7 +23,7 @@ on:
       BUILD_DIFFERENT_ROM:
         description: "Command to initialize a different 'repo' project:"
         required: false
-        default: "repo init -u https://github.com/ProjectMatrixx/android.git -b 14.0 --git-lfs"
+        default: "repo init -u https://github.com/SuperiorExtended/manifest -b UDC --git-lfs"
       REMOVALS:
         description: "Folders to be removed before syncing:"
         required: false
@@ -34,7 +34,7 @@ on:
       LOCAL_MANIFEST_BRANCH:
         description: "Personal local manifest's branch:"
         required: false
-        default: 'mtx-14'
+        default: 'sup-ex'
       DEVICE_NAME:
         description: "Device's codename:"
         required: true
@@ -42,15 +42,15 @@ on:
       PRODUCT_NAME:
         description: "Product to build:"
         required: true
-        default: "lineage_lavender"
+        default: "superior_lavender"
       BUILD_COMMAND:
         description: 'Command to be used for compiling:'
         required: true
-        default: 'm bacon'
+        default: 'mka bacon'
       BUILD_TYPE:
         description: 'Type of build:'
         required: true
-        default: 'userdebug'
+        default: 'eng'
         type: choice
         options: 
         - 'eng'
