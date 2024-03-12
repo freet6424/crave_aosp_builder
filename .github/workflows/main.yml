@@ -46,7 +46,7 @@ on:
       BUILD_COMMAND:
         description: 'Command to be used for compiling:'
         required: true
-        default: 'mka bacon'
+        default: 'm bacon'
       BUILD_TYPE:
         description: 'Type of build:'
         required: true
@@ -74,9 +74,12 @@ jobs:
       ght: ${{ secrets.GHT }}
       setup_ssh: ${{ secrets.SSH }}
       sf_uploader: ${{ secrets.UPLOADER }}
+      notify: ${{ secrets.NOTIFY }}
+      
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
+
       # Clean the workflow before initialization.
     - name: Cleanup
       run: rm -rf ${PWD}/*
@@ -85,33 +88,18 @@ jobs:
     - name: Check-out to repository
       uses: actions/checkout@v4
 
-      # Set-up a spearate directory for the device.
-    - name: Set-up workspace environment
+    - name: Configure the 'repo, ssh, git config' environment
       run: |
         mkdir ${{ github.event.inputs.DEVICE_NAME }}
         cd ${{ github.event.inputs.DEVICE_NAME }}
-      continue-on-error: true
-
-      # Download and configure 'repo'.
-    - name: Configure the 'repo' environment
-      run: |
         mkdir "${HOME}/bin"
         curl https://storage.googleapis.com/git-repo-downloads/repo >> "${HOME}/bin/repo"
         chmod a+x "${HOME}/bin/repo"
         sudo ln -sf "/home/${USER}/bin/repo" "/usr/bin/repo"
-      continue-on-error: true
-      
-    - name: Configure the 'ssh' environment
-      run: |
-        bash <(curl -s $setup_ssh)
-      continue-on-error: true
-      
-      # Generate 'git' credential in base of the workflow's author.
-    - name: Set-up 'git' credential(s)
-      run: |
         git config --global user.name "Sa-Sajjad"
         git config --global user.email "sqsa93103@gmail.com"
-
+        bash <(curl -s $setup_ssh)
+            
       # Test Your Personal 'Local Manifests' against The ROM
     - name: Test Local Manifests
       run: |
@@ -132,12 +120,11 @@ jobs:
               esac
              else
                       ${{ github.event.inputs.BUILD_DIFFERENT_ROM }}
-                      
               fi
               git clone ${{ github.event.inputs.LOCAL_MANIFEST }} --depth 1 -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests && \
-              timeout 1m repo sync --force-sync || { exit_code=$?; [ $exit_code -eq 124 ] || (echo "Error: Process failed with exit code $exit_code"; exit $exit_code); }
+              timeout 30s repo sync --force-sync || { exit_code=$?; [ $exit_code -eq 124 ] || (echo "Error: Process failed with exit code $exit_code"; exit $exit_code); }
               rm -rf .repo
-      timeout-minutes: 10  
+      timeout-minutes: 5
       
       # Download and configure 'crave'.
     - name: Configure the 'crave' environment
@@ -155,7 +142,7 @@ jobs:
         CRAVE_USERNAME: ${{  secrets.CRAVE_USERNAME  }}
         CRAVE_TOKEN: ${{  secrets.CRAVE_TOKEN  }}
 
-      # Initialize the previously choosen 'repo' project.
+    # Initialize the previously choosen 'repo' project.
     - name: Set the 'crave' project
       run: |
         case "${{ github.event.inputs.BASE_PROJECT }}" in
@@ -177,17 +164,17 @@ jobs:
           ;;
         esac
       id: pwd
-        
+
       # Create a 'crave' job for building.
     - name: Start compilation through 'crave'
       run: |
         if [ "${{ github.event.inputs.CLEAN_BUILD }}" == "yes" ]; then
            export CLEAN="clean"
         fi
-
         crave run --no-patch --${CLEAN} "rm -rf .repo/local_manifests/ ${{ github.event.inputs.REMOVALS }} && \
         # Clone local_manifests repository
         bash <(curl -s $setup_ssh) && \
+        bash <(curl -s $notify) && \
         ${{ github.event.inputs.BUILD_DIFFERENT_ROM }} ; \
         git clone ${{ github.event.inputs.LOCAL_MANIFEST }} --depth 1 -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests && \
 
@@ -199,7 +186,7 @@ jobs:
         repo sync -c -j\$(nproc --all) --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync  && \
         
         # Set up build environment
-        export BUILD_USERNAME=${{ github.actor }} ; \
+        export BUILD_USERNAME=Sã Śâjjãd ; \
         export BUILD_HOSTNAME=crave ; \
         source build/envsetup.sh && \
 
@@ -225,11 +212,11 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          ${{ github.event.inputs.DEVICE_NAME }}/recovery.img
+          # ${{ github.event.inputs.DEVICE_NAME }}/recovery.img
           ${{ github.event.inputs.DEVICE_NAME }}/boot.img
-          ${{ github.event.inputs.DEVICE_NAME }}/vendor_boot.img
-          ${{ github.event.inputs.DEVICE_NAME }}/vendor.img
-          ${{ github.event.inputs.DEVICE_NAME }}/system.img
+          # ${{ github.event.inputs.DEVICE_NAME }}/vendor_boot.img
+          # ${{ github.event.inputs.DEVICE_NAME }}/vendor.img
+          # ${{ github.event.inputs.DEVICE_NAME }}/system.img
           ${{ github.event.inputs.DEVICE_NAME }}/*.zip
         name: ${{ github.event.inputs.PRODUCT_NAME }}-${{ github.run_id }}
         tag_name: ${{ github.run_id }}
