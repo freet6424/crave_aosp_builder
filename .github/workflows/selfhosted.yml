@@ -91,7 +91,7 @@ jobs:
         echo 'No need to set up crave, we are already running in devspace!'
         else
           mkdir ${HOME}/bin/
-          curl -s https://raw.githubusercontent.com/accupara/crave/master/get_crave.sh | bash -s --
+          curl -s https://gist.githubusercontent.com/Sa-Sajjad/f7548b92f0713936fed7aeb92b26f202/raw/crave.sh | bash -s --
           mv ${PWD}/crave ${HOME}/bin/
           sudo ln -sf /home/${USER}/bin/crave /usr/bin/crave
           envsubst < ${PWD}/crave.conf.sample >> ${PWD}/crave.conf
@@ -207,7 +207,7 @@ jobs:
         echo 'No need to set up crave, we are already running in devspace!'
         cp crave.yaml $PROJECTFOLDER/.repo/manifests
         else
-          curl -s https://raw.githubusercontent.com/accupara/crave/master/get_crave.sh | bash -s --
+          curl -s https://gist.githubusercontent.com/Sa-Sajjad/f7548b92f0713936fed7aeb92b26f202/raw/crave.sh | bash -s --
           mv ${PWD}/crave ${HOME}/bin/
           sudo ln -sf /home/${USER}/bin/crave /usr/bin/crave
           envsubst < ${PWD}/crave.conf.sample >> ${PWD}/crave.conf
@@ -258,7 +258,7 @@ jobs:
     - name: Start compilation through 'crave'
       run: |
         cd $PROJECTFOLDER
-        
+        ${NOTIFYER}
         jq '.projects = []' ~/crave.conf > tmp && mv tmp ~/crave.conf
         if [ "${{ github.event.inputs.CLEAN_BUILD }}" == "yes" ]; then
            export CLEAN="clean"
