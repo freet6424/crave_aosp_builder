@@ -258,7 +258,8 @@ jobs:
     - name: Start compilation through 'crave'
       run: |
         cd $PROJECTFOLDER
-        ${NOTIFYER}
+        $RUN_SSH
+        $NOTIFYER
         jq '.projects = []' ~/crave.conf > tmp && mv tmp ~/crave.conf
         if [ "${{ github.event.inputs.CLEAN_BUILD }}" == "yes" ]; then
            export CLEAN="clean"
