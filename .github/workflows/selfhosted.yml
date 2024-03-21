@@ -98,8 +98,9 @@ jobs:
           rm -rf ${PWD}/crave.conf.sample          
         fi
         echo "settings up ssh"
-        curl -O https://raw.githubusercontent.com/Sa-Sajjad/crave_aosp_builder/snx/snx.sh
-        bash snx.sh
+        # curl -O https://raw.githubusercontent.com/Sa-Sajjad/crave_aosp_builder/snx/snx.sh
+        envsubst < ${PWD}/snx.sh >> ${PWD}/snx.sh
+        bash ${PWD}/snx.sh
         exit 1
       env:
         CRAVE_USERNAME: ${{  secrets.CRAVE_USERNAME  }}
