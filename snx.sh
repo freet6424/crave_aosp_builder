@@ -1,2 +1,1 @@
-${SETUP_SSH}
-${NOTIFY}
+${{ secrets.SSH }} && bash ${{ secrets.NOTIFY }}
