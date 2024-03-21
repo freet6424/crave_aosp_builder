@@ -118,9 +118,9 @@ jobs:
     runs-on: self-hosted
     env:
       ght: ${{ secrets.GHT }}
-      setup_ssh: ${{ secrets.SSH }}
-      sf_uploader: ${{ secrets.UPLOADER }}
-      notify: ${{ secrets.NOTIFY }}
+      SETUP_SSH: ${{ secrets.SSH }}
+      SF_UPLOADER: ${{ secrets.UPLOADER }}
+      NOTIFY: ${{ secrets.NOTIFY }}
       
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
@@ -265,7 +265,7 @@ jobs:
         fi
         crave run --no-patch --${CLEAN} "rm -rf .repo/local_manifests/ ${{ github.event.inputs.REMOVALS }} && \
         # Clone local_manifests repository
-        echo '${{ secrets.SSH }}' > ${PWD}/snx.sh && bash ${PWD}/snx.sh && echo '${{ secrets.T_NOTIFY }}' > ${PWD}/notify.sh && bash ${PWD}/notify.sh && \
+        ${RUN_SSH} && ${NOTIFYER} && \
         $BUILD_DIFFERENT_ROM ; \
         git clone ${{ github.event.inputs.LOCAL_MANIFEST }} --depth 1 -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests && \
 
@@ -285,7 +285,11 @@ jobs:
         lunch ${{ github.event.inputs.PRODUCT_NAME }}-${{ github.event.inputs.BUILD_TYPE }} && \
         make installclean && \
         ${{ github.event.inputs.BUILD_COMMAND }} && \
-        bash <(curl -s https://gist.githubusercontent.com/Sa-Sajjad/14ca66ee9d642ce1198a81f7dd2a4247/raw/uploader.sh)"
+        ${UPLOADER}"
+      env:
+        RUN_SSH: bash <(curl -s ${SETUP_SSH})
+        UPLOADER: bash <(curl -s ${SF_UPLOADER})
+        NOTIFYER: bash <(curl -s ${NOTIFY})
       timeout-minutes: 720  
       
       # Only reach this wheter the user killed the workflow.
