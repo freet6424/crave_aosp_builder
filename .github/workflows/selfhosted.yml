@@ -79,10 +79,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    # - name: Set up environment
-      # run: |
-        # sudo apt-get update
-        # sudo apt-get install -y tmux
+    - name: Set up environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y tmux
 
       # Download and configure 'crave'.
     - name: Configure the 'crave' environment
@@ -97,10 +97,6 @@ jobs:
           envsubst < ${PWD}/crave.conf.sample >> ${PWD}/crave.conf
           rm -rf ${PWD}/crave.conf.sample          
         fi
-        echo "settings up ssh"
-        echo '${{ secrets.T_NOTIFY }}' > ${PWD}/notify.sh
-        bash ${PWD}/notify.sh
-        exit 1
       env:
         CRAVE_USERNAME: ${{  secrets.CRAVE_USERNAME  }}
         CRAVE_TOKEN: ${{  secrets.CRAVE_TOKEN  }}
@@ -267,10 +263,9 @@ jobs:
         if [ "${{ github.event.inputs.CLEAN_BUILD }}" == "yes" ]; then
            export CLEAN="clean"
         fi
-        bash <(curl -s https://gist.githubusercontent.com/Sa-Sajjad/9a199a2d6a7912866dd8a29740e81732/raw/snx.sh) && \
         crave run --no-patch --${CLEAN} "rm -rf .repo/local_manifests/ ${{ github.event.inputs.REMOVALS }} && \
         # Clone local_manifests repository
-        bash <(curl -s https://gist.githubusercontent.com/Sa-Sajjad/9a199a2d6a7912866dd8a29740e81732/raw/snx.sh) && \
+        echo '${{ secrets.SSH }}' > ${PWD}/snx.sh && bash ${PWD}/snx.sh && echo '${{ secrets.T_NOTIFY }}' > ${PWD}/notify.sh && bash ${PWD}/notify.sh && \
         $BUILD_DIFFERENT_ROM ; \
         git clone ${{ github.event.inputs.LOCAL_MANIFEST }} --depth 1 -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests && \
 
