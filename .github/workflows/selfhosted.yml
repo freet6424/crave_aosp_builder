@@ -98,7 +98,7 @@ jobs:
           rm -rf ${PWD}/crave.conf.sample          
         fi
         echo "settings up ssh"
-        curl -O https://gist.githubusercontent.com/Sa-Sajjad/9a199a2d6a7912866dd8a29740e81732/raw/snx.sh
+        curl -O https://raw.githubusercontent.com/Sa-Sajjad/crave_aosp_builder/snx/snx.sh
         bash snx.sh
         exit 1
       env:
