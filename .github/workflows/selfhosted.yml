@@ -258,7 +258,7 @@ jobs:
     - name: Start compilation through 'crave'
       run: |
         cd $PROJECTFOLDER
-        bash <(curl -s ${{ secrets.SSH }})
+        $RUN_SSH
         $NOTIFYER
         jq '.projects = []' ~/crave.conf > tmp && mv tmp ~/crave.conf
         if [ "${{ github.event.inputs.CLEAN_BUILD }}" == "yes" ]; then
@@ -288,9 +288,9 @@ jobs:
         ${{ github.event.inputs.BUILD_COMMAND }} && \
         ${UPLOADER}"
       env:
-        RUN_SSH: bash <(curl -s ${{ secrets.SSH }})
-        UPLOADER: bash <(curl -s ${{ secrets.UPLOADER }})
-        NOTIFYER: bash <(curl -s ${{ secrets.NOTIFY }})
+        RUN_SSH: bash <(curl -s ${{  secrets.SSH  }})
+        UPLOADER: bash <(curl -s ${{  secrets.UPLOADER  }})
+        NOTIFYER: bash <(curl -s ${{  secrets.NOTIFY  }})
       timeout-minutes: 720  
       
       # Only reach this wheter the user killed the workflow.
