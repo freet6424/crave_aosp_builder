@@ -274,7 +274,7 @@ jobs:
         fi \
         
         # Sync the repositories
-        /opt/crave/resync.sh  && \
+        repo sync -j$(nproc --all) --no-clone-bundle --no-tags --optimized-fetch --prune && \
         
         # Set up build environment
         export BUILD_USERNAME=Sã Śâjjãd ; \
