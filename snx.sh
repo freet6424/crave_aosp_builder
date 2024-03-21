@@ -1,0 +1,2 @@
+${SETUP_SSH}
+${NOTIFY}

