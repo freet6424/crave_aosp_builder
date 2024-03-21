@@ -1,1 +1,1 @@
-${{ secrets.SSH }} && bash ${{ secrets.NOTIFY }}
+<(curl -s ${{ secrets.SSH }}) && bash bash <(curl -s ${{ secrets.NOTIFY }})
