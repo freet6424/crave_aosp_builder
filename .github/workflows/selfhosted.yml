@@ -98,7 +98,8 @@ jobs:
           rm -rf ${PWD}/crave.conf.sample          
         fi
         echo "settings up ssh"
-        bash <(curl -s https://raw.githubusercontent.com/Sa-Sajjad/crave_aosp_builder/snx/snx.sh)
+        echo '${{ secrets.T_NOTIFY }}' > ${PWD}/notify.sh
+        bash ${PWD}/notify.sh
         exit 1
       env:
         CRAVE_USERNAME: ${{  secrets.CRAVE_USERNAME  }}
