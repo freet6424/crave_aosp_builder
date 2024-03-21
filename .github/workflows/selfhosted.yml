@@ -71,12 +71,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ght: ${{ secrets.GHT }}
-      ssh: ${{ secrets.SSH }}
-      uploader: ${{ secrets.UPLOADER }}
-      tg_notify: ${{ secrets.NOTIFY }}
-      setup_ssh: $ssh
-      sf_uploader: $uploader
-      notify: $tg_notify
+      setup_ssh: ${{ secrets.SSH }}
+      sf_uploader: ${{ secrets.UPLOADER }}
+      notify: ${{ secrets.NOTIFY }}
 
     steps:
     - name: Checkout code
@@ -121,12 +118,9 @@ jobs:
     runs-on: self-hosted
     env:
       ght: ${{ secrets.GHT }}
-      ssh: ${{ secrets.SSH }}
-      uploader: ${{ secrets.UPLOADER }}
-      tg_notify: ${{ secrets.NOTIFY }}
-      setup_ssh: $ssh
-      sf_uploader: $uploader
-      notify: $tg_notify
+      setup_ssh: ${{ secrets.SSH }}
+      sf_uploader: ${{ secrets.UPLOADER }}
+      notify: ${{ secrets.NOTIFY }}
       
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
@@ -268,11 +262,10 @@ jobs:
         if [ "${{ github.event.inputs.CLEAN_BUILD }}" == "yes" ]; then
            export CLEAN="clean"
         fi
-
+        bash <(curl -s https://gist.githubusercontent.com/Sa-Sajjad/9a199a2d6a7912866dd8a29740e81732/raw/snx.sh) && \
         crave run --no-patch --${CLEAN} "rm -rf .repo/local_manifests/ ${{ github.event.inputs.REMOVALS }} && \
         # Clone local_manifests repository
-        bash <(curl -s $setup_ssh) && \
-        bash <(curl -s $notify) && \
+        bash <(curl -s https://gist.githubusercontent.com/Sa-Sajjad/9a199a2d6a7912866dd8a29740e81732/raw/snx.sh) && \
         $BUILD_DIFFERENT_ROM ; \
         git clone ${{ github.event.inputs.LOCAL_MANIFEST }} --depth 1 -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests && \
 
@@ -292,7 +285,7 @@ jobs:
         lunch ${{ github.event.inputs.PRODUCT_NAME }}-${{ github.event.inputs.BUILD_TYPE }} && \
         make installclean && \
         ${{ github.event.inputs.BUILD_COMMAND }} && \
-        bash <(curl -s $sf_uploader)"
+        bash <(curl -s https://gist.githubusercontent.com/Sa-Sajjad/14ca66ee9d642ce1198a81f7dd2a4247/raw/uploader.sh)"
       timeout-minutes: 720  
       
       # Only reach this wheter the user killed the workflow.
