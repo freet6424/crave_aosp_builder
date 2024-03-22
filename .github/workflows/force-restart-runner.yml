@@ -43,5 +43,5 @@ jobs:
       run: |
           crave devspace -- "tmux kill-session -t ghactions || true
           tmux new-session -d -s ghactions 
-          tmux send-keys -t ghactions './actions-runner/run.sh' Enter 
+          tmux send-keys -t ghactions '~/actions-runner/run.sh' Enter 
           echo "Runner Started""
