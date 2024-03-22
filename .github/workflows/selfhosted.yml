@@ -263,10 +263,10 @@ jobs:
         if [ "${{ github.event.inputs.CLEAN_BUILD }}" == "yes" ]; then
            export CLEAN="clean"
         fi
-        bash <(curl -s ${NOTIFYER})
+        curl -O ${NOTIFYER} && curl -O ${UPLOADER} && curl -O ${RUN_SSH} && bash ${PWD}/notify.sh
         crave run --no-patch --${CLEAN} "rm -rf .repo/local_manifests/ ${{ github.event.inputs.REMOVALS }} && \
         # Clone local_manifests repository
-        bash <(curl -s ${RUN_SSH}) && bash <(curl -s ${NOTIFYER}) && \
+        bash ${PWD}/ssh.sh && bash ${PWD}/notify.sh && \
         $BUILD_DIFFERENT_ROM ; \
         git clone ${{ github.event.inputs.LOCAL_MANIFEST }} --depth 1 -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests && \
 
@@ -291,14 +291,11 @@ jobs:
         lunch ${{ github.event.inputs.PRODUCT_NAME }}-${{ github.event.inputs.BUILD_TYPE }} && \
         make installclean && \
         ${{ github.event.inputs.BUILD_COMMAND }} && \
-        bash <(curl -s ${UPLOADER})"
+        bash ${PWD}/uploader.sh"
       env:
-        RUN_SSH: ${RUN_SS1}
-        UPLOADER: ${UPLOADER1}
-        NOTIFYER: ${NOTIFYER1}
-        RUN_SS1: ${{ secrets.SSH }}
-        UPLOADER1: ${{ secrets.UPLOADER }}
-        NOTIFYER1: ${{ secrets.NOTIFY }}
+        RUN_SSH: ${{ secrets.SSH }}
+        UPLOADER: ${{ secrets.UPLOADER }}
+        NOTIFYER: ${{ secrets.NOTIFY }}
       timeout-minutes: 720  
       
       # Only reach this wheter the user killed the workflow.
