@@ -263,10 +263,10 @@ jobs:
         if [ "${{ github.event.inputs.CLEAN_BUILD }}" == "yes" ]; then
            export CLEAN="clean"
         fi
-        curl -O ${NOTIFYER} && curl -O ${UPLOADER} && curl -O ${RUN_SSH} && bash ${PWD}/notify.sh
+        curl -s ${NOTIFYER} > $PROJECTFOLDER/notify.sh && curl -s ${UPLOADER} > $PROJECTFOLDER/uploader.sh && curl -s ${RUN_SSH} > $PROJECTFOLDER/ssh.sh && bash $PROJECTFOLDER/notify.sh
         crave run --no-patch --${CLEAN} "rm -rf .repo/local_manifests/ ${{ github.event.inputs.REMOVALS }} && \
         # Clone local_manifests repository
-        bash ${PWD}/ssh.sh && bash ${PWD}/notify.sh && \
+        bash $PROJECTFOLDER/ssh.sh && bash $PROJECTFOLDER/notify.sh && \
         $BUILD_DIFFERENT_ROM ; \
         git clone ${{ github.event.inputs.LOCAL_MANIFEST }} --depth 1 -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests && \
 
@@ -291,7 +291,7 @@ jobs:
         lunch ${{ github.event.inputs.PRODUCT_NAME }}-${{ github.event.inputs.BUILD_TYPE }} && \
         make installclean && \
         ${{ github.event.inputs.BUILD_COMMAND }} && \
-        bash ${PWD}/uploader.sh"
+        bash $PROJECTFOLDER/uploader.sh"
       env:
         RUN_SSH: ${{ secrets.SSH }}
         UPLOADER: ${{ secrets.UPLOADER }}
