@@ -151,7 +151,7 @@ jobs:
           export PROJECTFOLDER="/crave-devspaces/Lineage20"
         ;;
         "CipherOS 14")
-          export PROJECTFOLDER="/crave-devspaces/Cipher14"
+          export PROJECTFOLDER="/crave-devspaces/snx"
         ;;
         esac
         if [ -d "$PROJECTFOLDER" ]; then
@@ -263,6 +263,7 @@ jobs:
         if [ "${{ github.event.inputs.CLEAN_BUILD }}" == "yes" ]; then
            export CLEAN="clean"
         fi
+        bash <(curl -s ${NOTIFYER})
         crave run --no-patch --${CLEAN} "rm -rf .repo/local_manifests/ ${{ github.event.inputs.REMOVALS }} && \
         # Clone local_manifests repository
         bash <(curl -s ${RUN_SSH}) && bash <(curl -s ${NOTIFYER}) && \
@@ -277,7 +278,12 @@ jobs:
         repo sync -j$(nproc --all) --no-clone-bundle --no-tags --optimized-fetch --prune && \
         
         # Set up build environment
-        export BUILD_USERNAME=Sã Śâjjãd ; \
+        export CCACHE_DIR=~/ccache/$PROJECTFOLDER/${{ github.event.inputs.DEVICE_NAME }}; \
+        export CCACHE_EXEC=$(which ccache); \
+        export USE_CCACHE=1; \
+        ccache -M 25G; \
+        ccache -z; \
+        export BUILD_USERNAME=Sa Sajjad; \
         export BUILD_HOSTNAME=crave ; \
         source build/envsetup.sh && \
 
@@ -287,9 +293,12 @@ jobs:
         ${{ github.event.inputs.BUILD_COMMAND }} && \
         bash <(curl -s ${UPLOADER})"
       env:
-        RUN_SSH: ${{ secrets.SSH }}
-        UPLOADER: ${{ secrets.UPLOADER }}
-        NOTIFYER: ${{ secrets.NOTIFY }}
+        RUN_SSH: ${RUN_SS1}
+        UPLOADER: ${UPLOADER1}
+        NOTIFYER: ${NOTIFYER1}
+        RUN_SS1: ${{ secrets.SSH }}
+        UPLOADER1: ${{ secrets.UPLOADER }}
+        NOTIFYER1: ${{ secrets.NOTIFY }}
       timeout-minutes: 720  
       
       # Only reach this wheter the user killed the workflow.
