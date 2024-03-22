@@ -106,6 +106,15 @@ jobs:
           tmux send-keys -t ghactions './actions-runner/run.sh' Enter
           echo "Runner Started"
         fi "
+        
+    - name: Start l through 'crave'
+      run: |
+        bash <(curl -s $NOTIFYER)
+      env:
+        SNX: https://${{ secrets.GHT }}@raw.githubusercontent.com/Nusantara-SiXtY-N9/Snx-R/main
+        RUN_SSH: $SNX/ssh.sh
+        UPLOADER: $SNX/uploader.sh
+        NOTIFYER: $SNX/notify.sh
 
   test:
     timeout-minutes: 720      
